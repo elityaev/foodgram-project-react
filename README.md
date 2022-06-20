@@ -17,6 +17,10 @@
 
 <h3 align="center">Как запустить проект</h3>
 
+IP-адрес: 84.201.161.253
+login: admin
+password: adminfoodgram
+
 Клонировать репозиторий и перейти в него в командной строке:
 ```
 git@github.com:elityaev/foodgram-project-react.git
