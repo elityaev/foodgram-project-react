@@ -8,9 +8,8 @@ services:
       - ../.env
 
   backend:
-    build: ../backend
+    image: elityaev/foodgram_backend
     restart: always
-    command: bash entrypoint.sh
     volumes:
       - static_value:/app/static/
       - media_value:/app/media/
@@ -20,9 +19,7 @@ services:
       - ../.env
 
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    image: elityaev/foodgram_frontend
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:

@@ -2,5 +2,6 @@ FROM python:3.7-slim
 WORKDIR /app
 COPY . .
 RUN pip install -r requirements.txt --no-cache-dir
-#CMD ["gunicorn", "backend.wsgi:application", "--bind", "0:8000"]
+RUN chmod ugo+x entrypoint.sh
+CMD sh entrypoint.sh
 
