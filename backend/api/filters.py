@@ -1,27 +1,11 @@
 from django_filters import rest_framework as filters
+from rest_framework.filters import SearchFilter
 
 from foodgram.models import Recipe, User
 
 
-# class CharFilterInFilter(filters.BaseInFilter, filters.CharFilter):
-#     pass
-#
-# class RecipeFilter(filters.FilterSet):
-#     tags = CharFilterInFilter(field_name='tags__slug', lookup_expr='in')
-#     author = filters.CharFilter()
-#     is_favorited = filters.CharFilter(method='is_favorited')
-#     # is_in_shopping_cart =
-#
-#     class Meta:
-#         model = Recipe
-#         fields = ['tags', 'author']
-#
-#     def is_favorited(self, queryset, name, value):
-#         print(value)
-#         if value == 1:
-#             return queryset.filter(is_favorited=True)
-#         if value == 0:
-#             return queryset.filter(is_favorited=False)
+class IngredientSearchFilter(SearchFilter):
+    search_param = 'name'
 
 
 class AuthorAndTagFilter(filters.FilterSet):
@@ -31,18 +15,16 @@ class AuthorAndTagFilter(filters.FilterSet):
     is_in_shopping_cart = filters.BooleanFilter(
         method='filter_is_in_shopping_cart')
 
+    class Meta:
+        model = Recipe
+        fields = ('tags', 'author')
+
     def filter_is_favorited(self, queryset, name, value):
-        print(value)
         if value and not self.request.user.is_anonymous:
             return queryset.filter(favorites__user=self.request.user)
         return queryset
 
     def filter_is_in_shopping_cart(self, queryset, name, value):
-        print(value)
         if value and not self.request.user.is_anonymous:
             return queryset.filter(cart__user=self.request.user)
         return queryset
-
-    class Meta:
-        model = Recipe
-        fields = ('tags', 'author')

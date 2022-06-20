@@ -1,8 +1,7 @@
-from django.contrib.auth import get_user_model
 from django.core import validators
 from django.db import models
 
-User = get_user_model()
+from users.models import User
 
 
 class Tag(models.Model):
@@ -65,7 +64,7 @@ class Recipe(models.Model):
     )
     image = models.ImageField(
         'Изображение блюда',
-        upload_to='images/',
+        upload_to='recipes/',
     )
     text = models.TextField('Описание рецепта')
     ingredients = models.ManyToManyField(
@@ -93,13 +92,13 @@ class Recipe(models.Model):
         db_index=True
     )
 
-    def __str__(self):
-        return f'{self.name}'
-
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
-        ordering = ['-pub_date']
+        ordering = ('-pub_date',)
+
+    def __str__(self):
+        return f'{self.name}'
 
 
 class Amount(models.Model):
@@ -127,7 +126,7 @@ class Amount(models.Model):
         verbose_name_plural = 'Количество ингредиентов'
         constraints = [
             models.UniqueConstraint(
-                fields=['ingredient', 'recipe'],
+                fields=('ingredient', 'recipe',),
                 name='unique_recipes_ingredients'
             )
         ]
@@ -152,7 +151,7 @@ class Favorite(models.Model):
         verbose_name_plural = 'Избранное'
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'recipe'],
+                fields=('user', 'recipe',),
                 name='unique_favorite'
             )
         ]
@@ -177,7 +176,7 @@ class Cart(models.Model):
         verbose_name_plural = 'Списки покупок'
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'recipe'],
+                fields=('user', 'recipe',),
                 name="unique_cart"
             )
         ]
@@ -187,7 +186,7 @@ class Follow(models.Model):
     user = models.ForeignKey(
          User, on_delete=models.CASCADE, related_name='follower'
     )
-    following = models.ForeignKey(
+    author = models.ForeignKey(
          User, on_delete=models.CASCADE, related_name='following'
     )
 
@@ -195,5 +194,6 @@ class Follow(models.Model):
         verbose_name = 'Подписки'
         verbose_name_plural = 'Подписки'
         constraints = [models.UniqueConstraint(
-            fields=['user', 'following'], name="unique_follow"
+            fields=('user', 'author',), name="unique_follow"
         )]
+        ordering = ('id',)

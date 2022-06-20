@@ -1,12 +1,15 @@
+import csv
+
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 
-from rest_framework import viewsets, status, filters
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .filters import AuthorAndTagFilter
+from .filters import AuthorAndTagFilter, IngredientSearchFilter
 from .pagination import LimitPageNumberPagination
 from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
 from .serializers import (TagSerializer, IngredientSerializer,
@@ -16,7 +19,6 @@ from foodgram.models import Recipe, Tag, Ingredient, Amount, Cart, Favorite
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    serializer_class = RecipeListSerializer
     queryset = Recipe.objects.all()
     pagination_class = LimitPageNumberPagination
     filter_backends = (DjangoFilterBackend,)
@@ -24,14 +26,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthorOrReadOnly, )
 
     def get_serializer_class(self):
-        if self.request.method == 'POST' or 'PATCH':
-            return RecipeCreateSerializer
-        return RecipeListSerializer
+        if self.request.method == 'GET':
+            return RecipeListSerializer
+        return RecipeCreateSerializer
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-
-    def perform_update(self, serializer):
         serializer.save(author=self.request.user)
 
     @action(
@@ -53,18 +52,20 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     else:
                         cart_dict[ingredient] = (amount.amount +
                                                  cart_dict[ingredient])
-        with open('data/cart.txt', 'w', encoding='utf-8') as f:
-            count = 0
-            for ingredient, amount in cart_dict.items():
-                count += 1
-                f.writelines(
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = ('attachment; '
+                                           'filename="shopping_list.csv"')
+        writer = csv.writer(response, lineterminator="\r")
+        count = 0
+        for ingredient, amount in cart_dict.items():
+            count += 1
+            writer.writerow(
+                [
                     f'{count}. {str(ingredient.name).capitalize()} '
                     f'({ingredient.measurement_unit}) - {amount}\n'
-                )
-        return Response(
-            {'status': 'Список покупок успешно выгружен'},
-            status=status.HTTP_200_OK
-        )
+                ]
+            )
+        return response
 
     @action(
         detail=True, methods=['post', 'delete'],
@@ -125,5 +126,5 @@ class IngredientViewSet(viewsets.ModelViewSet):
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
     permission_classes = (IsAdminOrReadOnly,)
-    filter_backends = (filters.SearchFilter,)
+    filter_backends = (IngredientSearchFilter,)
     search_fields = ('^name',)

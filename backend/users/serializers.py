@@ -1,56 +1,47 @@
+from djoser.serializers import UserSerializer, UserCreateSerializer
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
+from rest_framework.validators import UniqueValidator
 
 from foodgram.models import Follow
 from .models import User
 
 
-class UserSerializer(serializers.ModelSerializer):
+class CustomUserSerializer(UserSerializer):
     is_subscribed = SerializerMethodField()
 
     class Meta:
         model = User
-        fields = [
+        fields = (
             'email', 'id', 'username', 'first_name',
-            'last_name', 'is_subscribed'
-        ]
+            'last_name', 'is_subscribed',
+        )
 
     def get_is_subscribed(self, obj):
-        try:
-            if Follow.objects.filter(
-                    user=self.context['request'].user, following=obj).exists():
-                return True
-            else:
-                return False
-        except TypeError:
-            return False
+        if self.context['request'].user.is_authenticated and (
+                Follow.objects.filter(
+                    user=self.context['request'].user, author=obj).exists()):
+            return True
+        return False
 
 
-class CreateUserSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = User
-        fields = ['email', 'id', 'username', 'first_name', 'last_name']
-
-
-class SetPasswordSerializer(serializers.ModelSerializer):
-    new_password = serializers.CharField(required=True, max_length=150)
-    current_password = serializers.CharField(required=True, max_length=150)
-
-    class Meta:
-        model = User
-        fields = ['new_password', 'current_password']
-
-
-class GetTokenSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(
-        write_only=True, required=True, max_length=150
-    )
+class CustomUserCreateSerializer(UserCreateSerializer):
     email = serializers.EmailField(
-        write_only=True, required=True, max_length=254
+        validators=[UniqueValidator(queryset=User.objects.all())]
     )
-    auth_token = serializers.CharField(read_only=True, max_length=255)
+    username = serializers.CharField(
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
 
     class Meta:
         model = User
-        fields = ['password', 'email', 'auth_token']
+        fields = [
+            'email', 'id', 'username', 'first_name', 'last_name', 'password'
+        ]
+        extra_kwargs = {
+            'email': {'required': True},
+            'username': {'required': True},
+            'first_name': {'required': True},
+            'last_name': {'required': True},
+            'password': {'required': True},
+        }
