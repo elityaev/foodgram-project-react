@@ -5,8 +5,9 @@
 [![Django REST Framework](https://img.shields.io/badge/-Django%20REST%20Framework-464646?style=flat-square&logo=Django%20REST%20Framework)](https://www.django-rest-framework.org/)
 [![PostgreSQL](https://img.shields.io/badge/-PostgreSQL-464646?style=flat-square&logo=PostgreSQL)](https://www.postgresql.org/)
 <h2 align="center">
-  
-  
+http://84.201.161.253/recipes/ 
+login: admin
+password: adminfoodgra 
 </h2>
 
 <h3 align="center">Описание</h3>
@@ -16,10 +17,6 @@
 в список покупок, который можно выгрузить в текстовый файл.   
 
 <h3 align="center">Как запустить проект</h3>
-
-IP-адрес: 84.201.161.253
-login: admin
-password: adminfoodgram
 
 Клонировать репозиторий и перейти в него в командной строке:
 ```
