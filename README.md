@@ -4,11 +4,9 @@
 [![Django](https://img.shields.io/badge/-Django-464646?style=flat-square&logo=Django)](https://www.djangoproject.com/)
 [![Django REST Framework](https://img.shields.io/badge/-Django%20REST%20Framework-464646?style=flat-square&logo=Django%20REST%20Framework)](https://www.django-rest-framework.org/)
 [![PostgreSQL](https://img.shields.io/badge/-PostgreSQL-464646?style=flat-square&logo=PostgreSQL)](https://www.postgresql.org/)
-<!-- <h2 align="center">
-http://84.201.161.253/recipes/ 
-login: admin
-password: adminfoodgra 
-</h2> -->
+<h2 align="center">
+Проект развернут по адресу: http://84.201.167.233/recipes 
+</h2>
 
 <h3 align="center">Описание</h3>
 
